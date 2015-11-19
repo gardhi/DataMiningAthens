@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+from __future__ import division
 import math, random, os, json
 import numpy as np
 from collections import defaultdict
@@ -16,6 +17,13 @@ def main():
   print("###fdas###")
   print(nodeDegrees)
   # edgeWeights, nodeDegrees = findDensestsSubgraph(edgeWeights, nodeDegrees)
+
+def computeAverageDensity(edgeWeights, nodeDegrees):
+  e = 0
+  v = len(nodeDegrees)
+  for edge in edgeWeights:
+    e += edgeWeights[edge]
+  return e/v
 
 # def findDensestsSubgraph(edgeWeights, nodeDegrees, epsilon=0.1):
 #   print(edgeWeights)
