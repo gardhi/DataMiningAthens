@@ -13,12 +13,38 @@ unique_tagset = set()
 
 num_tweets = 0
 
+#Date spesifications:
+#    ParisJanuary has 31 files from 1 to 31
+#    ParisFebruary has 28 files from 1 to 28
+#    Oscars has 4 files from 23 to 26
+#    NewYork has 4 files from 23 to 26
+#
+
 #filtering data
-for date in range(1,32):
-    filename = "Paris-2015-1-" + str(date)
-    json_data = open("/cal/exterieurs/ext6641/ParisSearchJan/" + filename)
+
+#for date in range(1,32):
+#    filename = "Paris-2015-1-" + str(date)
+#    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/ParisSearchJanFiltered/" + filename, "wb") # test/" +filename,"wb") ##    
+#    json_data = open("/cal/exterieurs/ext6641/ParisSearchJan/" + filename)
+#
+#for date in range(1,29):    
+#    filename = "Paris-2015-2-" + str(date)
+#    json_data = open("/cal/exterieurs/ext6641/ParisSearchFeb/" + filename)
+#    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/ParisSearchFebFiltered/" + filename, "wb") # test/" +filename,"wb") ##  
+
+#for date in range(23,27):
+#    filename = "Oscars-2015-2-" + str(date)
+#    json_data = open("/cal/exterieurs/ext6641/Oscars/" + filename)
+#    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/OscarsFiltered/" + filename, "wb") # test/" +filename,"wb") ##  
+
+for date in range(23,27):
+    filename = "NewYork-2015-2-" + str(date)
+    json_data = open("/cal/exterieurs/ext6641/NewYorkOneWeek/" + filename)
+    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/NewYorkOneWeekFiltered/" + filename, "wb") # test/" +filename,"wb") ##  
+
+
+
     
-    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/ParisSearchJanFiltered/" + filename, "wb") # test/" +filename,"wb") ##
     
     for line in json_data: 
         num_tweets += 1        
