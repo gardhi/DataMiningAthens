@@ -32,7 +32,7 @@ for date in range(1,32):
             
             if (len(utdata["hashtags"]) > 1):
                 
-                if frozenset(utdata["hashtags"]) in unique_tagset:
+                if frozenset(utdata["hashtags"]) not in unique_tagset:
                     unique_tagset.add(frozenset(utdata["hashtags"]))
                     ut.write(json.dumps((utdata), indent=4, separators=(',',': '), sort_keys=True).replace("\n",''))
                     ut.write('\n')
@@ -40,5 +40,5 @@ for date in range(1,32):
     ut.close()
     json_data.close()
 
-print "Finished Filtering " + num_tweets + " tweets."
+print "Finished Filtering " + str(num_tweets) + " tweets."
 print("it took: %s seconds" % (time.time() - start_time))
