@@ -37,16 +37,16 @@ num_tweets = 0
 #    json_data = open("/cal/exterieurs/ext6641/Oscars/" + filename)
 #    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/OscarsFiltered/" + filename, "wb") # test/" +filename,"wb") ##  
 
-for date in range(23,27):
-    filename = "NewYork-2015-2-" + str(date)
-    json_data = open("/cal/exterieurs/ext6641/NewYorkOneWeek/" + filename)
-    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/NewYorkOneWeekFiltered/" + filename, "wb") # test/" +filename,"wb") ##  
+#for date in range(23,27):
+#    filename = "NewYork-2015-2-" + str(date)
+#    json_data = open("/cal/exterieurs/ext6641/NewYorkOneWeek/" + filename)
+#    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/NewYorkOneWeekFiltered/" + filename, "wb") # test/" +filename,"wb") ##  
 
 
 
     
     
-    for line in json_data: 
+for line in json_data: 
         num_tweets += 1        
         
         data = json.loads(line)

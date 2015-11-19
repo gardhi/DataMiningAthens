@@ -31,7 +31,7 @@ def computeAverageDensity(edgeWeights, nodeDegrees):
   return e/v
 
 # TODO: make sure it is OK.
-def findDensestsSubgraphParallell(edgeWeights, nodeDegrees, epsilon=0.5):
+def findDensestsSubgraphParallell(edgeWeights, nodeDegrees, epsilon=0.15):
   print("---------------------------findDensestsSubgraphParallell---------------------------")
   # print('avgGraphDensity: {}'.format(avgGraphDensity))
   # print('2*(1+epsilon)*avgGraphDensity = {}'.format(2*(1+epsilon)*avgGraphDensity))
@@ -41,9 +41,10 @@ def findDensestsSubgraphParallell(edgeWeights, nodeDegrees, epsilon=0.5):
   # Create a copy of the edge dictionary so we can delete items from it while iterating through it
   # newEdgeWeights = edgeWeights.copy()
 
+  rhoH = computeAverageDensity(edgeWeights, nodeDegrees)
 
   count = 0
-  while True:
+  while count < 100:
     print('iteration #{}'.format(count))
     oldNNodes = len(nodeDegrees)
     oldNEdges = len(edgeWeights)
@@ -54,31 +55,33 @@ def findDensestsSubgraphParallell(edgeWeights, nodeDegrees, epsilon=0.5):
       degree = nodeDegrees[node]
       # print(2*(1+epsilon)*avgGraphDensity)
       # print(degree)
+      print degree
+      print 2*(1+epsilon)*avgGraphDensity
       if degree <= 2*(1+epsilon)*avgGraphDensity:
         # print('node "{}" deleted'.format(node))
         del nodeDegrees[node]
         # Delete all edges connected to this node
         for edge in edgeWeights.keys():
-          node1, node2 = edge.split('-')
-          # print('{}-{}'.format(node1, node2))
-          if (node == node1):
-            # print('edge "{}" deleted'.format(edge))
-            del edgeWeights[edge]
-            # If statement to handle special case where edge is a self-edge, e.g. "follow-follow". Should it be filtered?
+            node1, node2 = edge.split('-')
             if node1 != node2:
-              nodeDegrees[node2] -= 1
-          elif (node == node2):
-            # print('edge "{}" deleted'.format(edge))
-            del edgeWeights[edge]
-            # If statement to handle special case where edge is a self-edge, e.g. "follow-follow". Should it be filtered?
-            if node1 != node2:
-              nodeDegrees[node1] -= 1
+                if node == node1:
+                    nodeDegrees[node2] -= edgeWeights[edge]
+                    del edgeWeights[edge] 
+                    #print('{}-{}'.format(node1, node2))
+                elif node == node2:
+                    nodeDegrees[node1] -= edgeWeights[edge]
+                    del edgeWeights[edge] 
+                    #print('{}-{}'.format(node1, node2))
+            else:
+                del edgeWeights[edge]
+              
+                   
+
       else:
         # All remaining nodes have higher degree, no need to continue
         print('breaking for loop when node degree is: {}'.format(degree))
         break
     
-    # print(len(edgeWeights))
     if len(edgeWeights) == 0: # TODO: is this correct, or should it be 0?
       break
 
@@ -87,9 +90,10 @@ def findDensestsSubgraphParallell(edgeWeights, nodeDegrees, epsilon=0.5):
     print('edgeWeights went from {} to {}'.format(oldNEdges, len(edgeWeights)))
     print('avgGraphDensity went from {} to {}'.format(avgGraphDensity, newAvgGraphDensity))
     
-    if newAvgGraphDensity > avgGraphDensity:
+    if newAvgGraphDensity > rhoH:
       newEdgeWeights = edgeWeights.copy()
       newNodeDegrees = nodeDegrees.copy()
+      rhoH = computeAverageDensity(newEdgeWeights, newNodeDegrees)
     
     count += 1
   print("while finished")
@@ -129,7 +133,7 @@ def findDensestsSubgraph(edgeWeights, nodeDegrees, epsilon=0.1):
         # If statement to handle special case where edge is a self-edge, e.g. "follow-follow". Should it be filtered?
         if node1 != node2:
           nodeDegrees[node1] -= 1
-
+    
     # Break while loop if we deleted last edge
     if len(edgeWeights) == 0:
       break
@@ -149,10 +153,10 @@ def findDensestsSubgraph(edgeWeights, nodeDegrees, epsilon=0.1):
 
 
 def buildGraph():
-  filteredDataPath = '../FilteredData/ParisSearchJanFiltered'
-  filename = 'Paris-2015-1-1'
+  filteredDataPath = '../FilteredData/ParisSearchFebFiltered'
+  filename = 'Paris-2015-2-1'
   # TODO: loop through multiple files
-  f = open(os.path.dirname(__file__) + os.path.join(filteredDataPath, filename), 'r')
+  f = open(os.path.dirname(__file__) + "/" + os.path.join(filteredDataPath, filename), 'r')
   
   for line in f:
     # tweet_id = tweet['id']
