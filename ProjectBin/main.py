@@ -29,18 +29,15 @@ def main():
 
   
 def findSeveralDenseSubgrafs(edgeWeights, nodeDegrees, epsilon, numGraphs):
-    
-    denseEdgeWeightList =  []
+    denseEdgeWeightList = []
     denseNodeDegreeList = []
+
     for i in range(numGraphs+1):
-        denseEdgeWeights, denseNodeDegrees = findDensestsSubgraphParallell(edgeWeights, nodeDegrees, epsilon)
-        print " nodeWeights = "
-        print denseEdgeWeights
-        print "nodeDegrees = "
-        print denseNodeDegrees
-        
-#        if denseEdgeWeights and denseNodeDegrees:        
+        print("finding dense subgraph #{} with graph:".format(i+1))
+        denseEdgeWeights, denseNodeDegrees = findDensestsSubgraphParallell(edgeWeights.copy(), nodeDegrees.copy(), epsilon)
+
         for node in denseNodeDegrees:
+            print("deleting node: {}".format(node))
             # print('node "{}" deleted'.format(node))
             del nodeDegrees[node]
             # Delete all edges connected to this node
@@ -49,15 +46,22 @@ def findSeveralDenseSubgrafs(edgeWeights, nodeDegrees, epsilon, numGraphs):
                 if node1 != node2:
                     if node == node1:
                         nodeDegrees[node2] -= edgeWeights[edge]
-                        del edgeWeights[edge] 
+                        # if nodeDegrees[node2] == 0:
+                        #     del nodeDegrees[node2]
+                        del edgeWeights[edge]
+                        print("deleting edge: {}".format(edge))
                         #print('{}-{}'.format(node1, node2))
                     elif node == node2:
                         nodeDegrees[node1] -= edgeWeights[edge]
+                        # if nodeDegrees[node1] == 0:
+                        #     del nodeDegrees[node1]
                         del edgeWeights[edge] 
+                        print("deleting edge: {}".format(edge))
                         #print('{}-{}'.format(node1, node2))
                 else:
                     del edgeWeights[edge]
-                    
+                    print("deleting edge: {}".format(edge))
+
         denseEdgeWeightList.append(denseEdgeWeights)
         denseNodeDegreeList.append(denseNodeDegrees)
     return denseEdgeWeightList, denseNodeDegreeList            
