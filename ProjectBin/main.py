@@ -46,26 +46,40 @@ def findSeveralDenseSubgrafs(edgeWeights, nodeDegrees, epsilon, numGraphs):
     denseNodeDegreeList = []
 
     for i in range(numGraphs):
-        print("finding dense subgraph #{} with graph:".format(i+1))
+        print("Finding dense subgraph #{}".format(i+1))
         denseEdgeWeights, denseNodeDegrees = findDensestsSubgraphParallell(edgeWeights.copy(), nodeDegrees.copy(), epsilon)
 
+        subgraphIntegrities = {}
         for node in denseNodeDegrees:
-            # print('node "{}" deleted'.format(node))
-            del nodeDegrees[node]
-            # Delete all edges connected to this node
-            for edge in edgeWeights.keys():
+            degreeInSubgraph = 0
+            for edge in denseEdgeWeights.keys():
                 node1, node2 = edge.split('-')
-                """If edge is a self edge, delete it and don't reduce the degree
+                if (node == node1 or node == node2):
+                    degreeInSubgraph += denseEdgeWeights[edge]
+            subgraphIntegrity = degreeInSubgraph/denseNodeDegrees[node]
+            subgraphIntegrities[node] = subgraphIntegrity
+        avgSubgraphIntegrity = sum(subgraphIntegrities.values())/len(subgraphIntegrities)
+        
+        for node in denseNodeDegrees:
+            # We want to keep nodes that doesn't have a high integrity.
+            isDenseInSubgraph = subgraphIntegrities[node] > avgSubgraphIntegrity
+            if isDenseInSubgraph:
+                del nodeDegrees[node]
+
+                # Delete all edges connected to this node
+                for edge in edgeWeights.keys():
+                    node1, node2 = edge.split('-')
+                    """If edge is a self edge, delete it and don't reduce the degree
                     of "the other" node, since it is yourself"""
-                if node1 == node2:
-                    del edgeWeights[edge]
-                else:
-                    if node == node1:
-                        nodeDegrees[node2] -= edgeWeights[edge]
+                    if node1 == node2:
                         del edgeWeights[edge]
-                    elif node == node2:
-                        nodeDegrees[node1] -= edgeWeights[edge]
-                        del edgeWeights[edge] 
+                    else:
+                        if node == node1:
+                            nodeDegrees[node2] -= edgeWeights[edge]
+                            del edgeWeights[edge]
+                        elif node == node2:
+                            nodeDegrees[node1] -= edgeWeights[edge]
+                            del edgeWeights[edge]
 
         denseEdgeWeightList.append(denseEdgeWeights)
         denseNodeDegreeList.append(denseNodeDegrees)
