@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from __future__ import division
-import math, random, os, json
+import math, random, os, json, operator
 import numpy as np
 from collections import defaultdict
 from collections import OrderedDict
@@ -11,9 +11,9 @@ edgeWeights = defaultdict(int)
 nodeDegrees = defaultdict(int)
 
 def main():
-    dataSet = "ParisSearchFebFiltered/"
-    fileName = "Paris-2015-2-"
-    fileRange = (1,28)
+    dataSet = "ParisSearchJanFiltered/"
+    fileName = "Paris-2015-1-"
+    fileRange = (1,31)
 
     epsilon = 0.067
     numGraphs = 3
@@ -63,10 +63,29 @@ def findSeveralDenseSubgrafs(edgeWeights, nodeDegrees, epsilon, numGraphs):
         for node in denseNodeDegrees:
             # We want to keep nodes that doesn't have a high integrity.
             isDenseInSubgraph = subgraphIntegrities[node] > avgSubgraphIntegrity
+            noNodeDeleted = True
             if isDenseInSubgraph:
+                noNodeDeleted = False
                 del nodeDegrees[node]
 
                 # Delete all edges connected to this node
+                for edge in edgeWeights.keys():
+                    node1, node2 = edge.split('-')
+                    """If edge is a self edge, delete it and don't reduce the degree
+                    of "the other" node, since it is yourself"""
+                    if node1 == node2:
+                        del edgeWeights[edge]
+                    else:
+                        if node == node1:
+                            nodeDegrees[node2] -= edgeWeights[edge]
+                            del edgeWeights[edge]
+                        elif node == node2:
+                            nodeDegrees[node1] -= edgeWeights[edge]
+                            del edgeWeights[edge]
+
+            if noNodeDeleted:
+                # Find node with lowest degree in the dense subgraph and remove it and its edges
+                node = min(denseNodeDegrees.iteritems(), key=operator.itemgetter(1))[0]
                 for edge in edgeWeights.keys():
                     node1, node2 = edge.split('-')
                     """If edge is a self edge, delete it and don't reduce the degree
