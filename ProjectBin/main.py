@@ -15,18 +15,29 @@ def main():
   print("################################################################################################")
   print("################################################################################################")
   print("################################################################################################")
-  edgeWeights, nodeDegrees = buildGraph()
-  # print(edgeWeights)
-  # print("###fdas###")
-  # print(nodeDegrees)
-  epsilon = 0.1
-  numGraphs = 2
-  edgeWeights, nodeDegrees = findSeveralDenseSubgrafs(edgeWeights, nodeDegrees, epsilon, numGraphs)  
-  #edgeWeights, nodeDegrees = findDensestsSubgraphParallell(edgeWeights, nodeDegrees, epsilon)
-  for i in range(0,len(edgeWeights)):
-      print(edgeWeights[i])
-      print(nodeDegrees[i])
+    
 
+  dataSet = "ParisSearchFebFiltered/" 
+  fileName = "Paris-2015-2-"
+  fileRange = (1,28)
+  
+  epsilon = 0.067
+  numGraphs = 2  
+  
+  edgeWeights, nodeDegrees = buildGraph(dataSet,fileName,fileRange)
+
+#  edgeWeights, nodeDegrees = findSeveralDenseSubgrafs(edgeWeights, nodeDegrees, epsilon, numGraphs)  
+#  for i in range(0,len(edgeWeights)):
+#      print(edgeWeights[i])
+#      print(nodeDegrees[i])  
+  
+  denseEdgeWeights, denseNodeDegrees = findDensestsSubgraphParallell(edgeWeights, nodeDegrees, epsilon)
+  print " nodeWeights = "
+  print denseEdgeWeights
+  print "nodeDegrees = "
+  print denseNodeDegrees
+
+#
   
 def findSeveralDenseSubgrafs(edgeWeights, nodeDegrees, epsilon, numGraphs):
     
@@ -138,46 +149,47 @@ def findDensestsSubgraphParallell(edgeWeights, nodeDegrees, epsilon):
 
 
 
-def buildGraph():
-  filteredDataPath = '../FilteredData/ParisSearchFebFiltered'
-  filename = 'Paris-2015-2-1'
-  # TODO: loop through multiple files
-  f = open(os.path.dirname(__file__) + "/" + os.path.join(filteredDataPath, filename), 'r')
-  
-  for line in f:
-    # tweet_id = tweet['id']
-    # text = tweet['text']
-    tweet = json.loads(line)
-    hashtags = tweet['hashtags']
+def buildGraph(dataSet, fileName, fileRange):
 
-    # Create a list of neighbours (hashtags occuring in the same tweet)
-    neighbours = []
+  filteredDataPath = "../FilteredData/" + dataSet
 
-    # Only care for tweets with more than 1 hashtag
-    if len(hashtags) > 1: # This should be implicit after filtering is done
-      for hashtag in hashtags:
-        # print(hashtag)
-        neighbours.append(hashtag)
-
-    # Sort the list of hashtags to avoid duplicate keys, e.g. "a-b" and "b-a"
-    neighbours.sort()
-
-    for i in range(0, len(neighbours)):
-      # Only need to look through the rest of the list
-      for j in range(i+1, len(neighbours)):
-        key = "{}-{}".format(neighbours[i].encode('utf-8'), neighbours[j].encode('utf-8'))
-        
-        # Increase the weight of the edge if it exists, otherwise set it to 1
-        if key in edgeWeights:
-          edgeWeights[key] += 1
-        else:
-          edgeWeights[key] = 1
-
-        # Also, keep track of degree
-        nodeDegrees[neighbours[i].encode('utf-8')] += 1 # TODO: make sure this gives a degree that is the sum of the weights of the node's neighbours
-        nodeDegrees[neighbours[j].encode('utf-8')] += 1
-  
-  f.close()
+  for file_n in fileRange:
+      fileName_n = fileName + str(file_n)
+      f = open(os.path.dirname(__file__) + "/" + os.path.join(filteredDataPath, fileName_n), 'r')
+      for line in f:
+        # tweet_id = tweet['id']
+        # text = tweet['text']
+        tweet = json.loads(line)
+        hashtags = tweet['hashtags']
+    
+        # Create a list of neighbours (hashtags occuring in the same tweet)
+        neighbours = []
+    
+        # Only care for tweets with more than 1 hashtag
+        if len(hashtags) > 1: # This should be implicit after filtering is done
+          for hashtag in hashtags:
+            # print(hashtag)
+            neighbours.append(hashtag)
+    
+        # Sort the list of hashtags to avoid duplicate keys, e.g. "a-b" and "b-a"
+        neighbours.sort()
+    
+        for i in range(0, len(neighbours)):
+          # Only need to look through the rest of the list
+          for j in range(i+1, len(neighbours)):
+            key = "{}-{}".format(neighbours[i].encode('utf-8'), neighbours[j].encode('utf-8'))
+            
+            # Increase the weight of the edge if it exists, otherwise set it to 1
+            if key in edgeWeights:
+              edgeWeights[key] += 1
+            else:
+              edgeWeights[key] = 1
+    
+            # Also, keep track of degree
+            nodeDegrees[neighbours[i].encode('utf-8')] += 1 # TODO: make sure this gives a degree that is the sum of the weights of the node's neighbours
+            nodeDegrees[neighbours[j].encode('utf-8')] += 1
+      
+      f.close()
 
   return edgeWeights, nodeDegrees
 
