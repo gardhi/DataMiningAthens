@@ -22,49 +22,46 @@ num_tweets = 0
 
 #filtering data
 
-#for date in range(1,32):
+# for date in range(1,32):
 #    filename = "Paris-2015-1-" + str(date)
-#    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/ParisSearchJanFiltered/" + filename, "wb") # test/" +filename,"wb") ##    
+#    out = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/ParisSearchJanFiltered/" + filename, "wb") # test/" +filename,"wb") ##
 #    json_data = open("/cal/exterieurs/ext6641/ParisSearchJan/" + filename)
-#
+
 #for date in range(1,29):    
 #    filename = "Paris-2015-2-" + str(date)
 #    json_data = open("/cal/exterieurs/ext6641/ParisSearchFeb/" + filename)
-#    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/ParisSearchFebFiltered/" + filename, "wb") # test/" +filename,"wb") ##  
+#    out = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/ParisSearchFebFiltered/" + filename, "wb") # test/" +filename,"wb") ##
 
 #for date in range(23,27):
 #    filename = "Oscars-2015-2-" + str(date)
 #    json_data = open("/cal/exterieurs/ext6641/Oscars/" + filename)
-#    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/OscarsFiltered/" + filename, "wb") # test/" +filename,"wb") ##  
+#    out = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/OscarsFiltered/" + filename, "wb") # test/" +filename,"wb") ##
 
 #for date in range(23,27):
 #    filename = "NewYork-2015-2-" + str(date)
 #    json_data = open("/cal/exterieurs/ext6641/NewYorkOneWeek/" + filename)
-#    ut = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/NewYorkOneWeekFiltered/" + filename, "wb") # test/" +filename,"wb") ##  
+#    out = open("/cal/exterieurs/ext6641/DataMiningAthens/FilteredData/NewYorkOneWeekFiltered/" + filename, "wb") # test/" +filename,"wb") ##
 
-
-
+for line in json_data:
+    num_tweets += 1
     
+    data = json.loads(line)
     
-for line in json_data: 
-        num_tweets += 1        
+    if data["entities"]["hashtags"]:
+        outdata = {"id" : data["id"], "hashtags": [], "text" : data["text"], "user_id" : data["user"]["id"]}
         
-        data = json.loads(line)
-        
-        if(data["entities"]["hashtags"]):
-            utdata = {"id" : data["id"], "hashtags": [], "text" : data["text"], "user_id" : data["user"]["id"]}
-            for tags in data["entities"]["hashtags"]:                
-                utdata['hashtags'].append(tags["text"].lower())
-            
-            if (len(utdata["hashtags"]) > 1):
-                
-                if frozenset(utdata["hashtags"]) not in unique_tagset:
-                    unique_tagset.add(frozenset(utdata["hashtags"]))
-                    ut.write(json.dumps((utdata), indent=4, separators=(',',': '), sort_keys=True).replace("\n",''))
-                    ut.write('\n')
+        for tags in data["entities"]["hashtags"]:
+            outdata['hashtags'].append(tags["text"].lower())
 
-    ut.close()
-    json_data.close()
+        # We only care for tweets with multiple hashtags
+        if (len(outdata["hashtags"]) > 1):
+            if frozenset(outdata["hashtags"]) not in unique_tagset:
+                unique_tagset.add(frozenset(outdata["hashtags"]))
+                out.write(json.dumps((outdata), indent=4, separators=(',',': '), sort_keys=True).replace("\n",''))
+                out.write('\n')
+
+out.close()
+json_data.close()
 
 print "Finished Filtering " + str(num_tweets) + " tweets."
-print("it took: %s seconds" % (time.time() - start_time))
+print("It took: %s seconds" % (time.time() - start_time))
